@@ -18,8 +18,10 @@ Major Changes from ChiperSoft Library Revision
 
 produces:
 
-    <label for="name">Name:</label> 
-    <input type="text" id="name" name="name"/>
+```html
+<label for="name">Name:</label> 
+<input type="text" id="name" name="name"/>
+```
 
 **Radio buttons**
 
