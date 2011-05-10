@@ -13,8 +13,9 @@ Major Changes from ChiperSoft Library Revision
 
 **Text fields**
 
-
-    name = ________
+```markdown
+name = ________
+```
 
 produces:
 
@@ -29,9 +30,11 @@ produces:
 
 produces:
 
-    <label>Sex:</label> 
-    <input type="radio" name="sex" id="male" value="male" checked="checked"/><label for="male">Male</label>
-    <input type="radio" name="sex" id="female value="female"/><label for="female">Female</label>  
+```html
+<label>Sex:</label> 
+<input type="radio" name="sex" id="male" value="male" checked="checked"/><label for="male">Male</label>
+<input type="radio" name="sex" id="female value="female"/><label for="female">Female</label>  
+```
 
 **Check boxes**
 
@@ -39,10 +42,12 @@ produces:
 
 produces:
 
-    <label>Phones:</label> 
-    <input type="checkbox" name="phones" id="Android" value="Android"/><label for="Android">Android</label>
-    <input type="checkbox" name="phones" id="iPhone" value="iPhone" checked="checked"/><label for="iPhone">iPhone</label>
-    <input type="checkbox" name="phones" id="Blackberry" value="Blackberry" checked="checked"/><label for="Blackberry">Blackberry</label>
+```html
+<label>Phones:</label> 
+<input type="checkbox" name="phones" id="Android" value="Android"/><label for="Android">Android</label>
+<input type="checkbox" name="phones" id="iPhone" value="iPhone" checked="checked"/><label for="iPhone">iPhone</label>
+<input type="checkbox" name="phones" id="Blackberry" value="Blackberry" checked="checked"/><label for="Blackberry">Blackberry</label>
+```
 
 **Drop down**
 
@@ -50,54 +55,55 @@ produces:
 
 produces:
 
-    <label for="city">City:</label>
-    <select id="city" name="city">
-      <option value="BOS">BOS</option>
-      <option value="SFO">SFO</option>
-      <option value="NYC" selected="selected">NYC</option>
-    </select>
-
+```html
+<label for="city">City:</label>
+<select id="city" name="city">
+  <option value="BOS">BOS</option>
+  <option value="SFO">SFO</option>
+  <option value="NYC" selected="selected">NYC</option>
+</select>
+```
 **Required fields**
 
     zip code* = ________
 
 produces:
 
-    <label for="zip-code" class="required-label">Zip code*:</label>
-    <input type="text" name="zip-code" id="zip-code" class="required-input"/>
-
+```html
+<label for="zip-code" class="required-label">Zip code*:</label>
+<input type="text" name="zip-code" id="zip-code" class="required-input"/>
+```
 
 How to use
 ----------
 
-	<html>
-	    <head>
-	        <title>WMD Example</title>
-        
-	        <link rel="stylesheet" type="text/css" href="wmd.css"/>
-	        <script type="text/javascript" src="wmd.js"></script>
-	        <script type="text/javascript" src="showdown.js"></script>
-	    </head>
-	    <body>
-	        <h1>WMD Example</h1>
-
-	        <div>
-	            <div id="notes-button-bar"></div>
-	            <textarea id="notes" name="copy"></textarea>
-	            <div id="notes-preview"></div>
-				<input type="text" name="copy_html" value="" id="copy_html">
-	        </div>
-
-	        <script type="text/javascript">
-	            setup_wmd({
-	                input: "notes",
-	                button_bar: "notes-button-bar",
-	                preview: "notes-preview",
-					output: "copy_html"
-	            });
-	        </script>
-	    </body>
-	</html>
+```html
+<html>
+  <head>
+    <title>WMD Example</title>        
+    <link rel="stylesheet" type="text/css" href="wmd.css"/>
+    <script type="text/javascript" src="wmd.js"></script>
+    <script type="text/javascript" src="showdown.js"></script>
+  </head>
+  <body>
+    <h1>WMD Example</h1>
+    <div>
+      <div id="notes-button-bar"></div>
+      <textarea id="notes" name="copy"></textarea>
+      <div id="notes-preview"></div>
+      <input type="text" name="copy_html" value="" id="copy_html"/>
+    </div>
+    <script type="text/javascript">
+      setup_wmd({
+        input: "notes",
+        button_bar: "notes-button-bar",
+        preview: "notes-preview",
+        output: "copy_html"
+      });
+    </script>
+  </body>
+</html>
+```
 
 Status
 -------
