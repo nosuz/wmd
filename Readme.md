@@ -6,23 +6,64 @@ Introduction
 
 WMD is a JavaScript based code editor for the [Markdown](http://daringfireball.net/projects/markdown/) formatting language.  It includes a Markdown interpreter – Showdown – for live preview and output of the Markdown generated HTML.
 
-This is a fork of WMD for ChiperSoft Systems & NFY Interactive designed for use in CMS engines.  It was forked from the [Open Library fork](http://github.com/openlibrary/wmd) of WMD, which was in turn forked from the [Stackoverflow fork](http://github.com/derobins/wmd).
+The goal of this project is to add support for simple input elements and forms to Markdown. This code is forked from the [ChiperSoft fork](https://github.com/ChiperSoft/wmd) of WMD, which, in turn, was forked from a number of other sources. All credit goes to the respective authors.
 
-Major Changes from Open Library Revision
+Major Changes from ChiperSoft Library Revision
 -------------
 
-* Extended showdown to support a series of Markdown extensions:
-  - Link urls that start with ! are opened in a new window
-  - Text wrapped with double carets is made superscript (ex: `^^this text is superscripted^^`)
-  - Text wrapped with double commas is made subscript (ex: `,,this text is subscripted,,`)
-  - Text wrapped with double tildes is made strikethrough (ex: `~~this text is struck~~`)
-  - (c), (r), (tm), -- and ... are converted into their respective html entities.
-  - Lines prefixed with "->" are right aligned.  Lines also postfixed with "<-" are center aligned.
-* Several ascii characters that may produce encoding issues (such as curled quotes) are converted into entities
-* Removed top level frame pollution, forcing WMD to run only in its own document.
-* Removed the automatic conversion from Markdown to HTML when the form is submitted.
-* Removed the automatic addition of http:// to image urls, preventing the entry of relative addresses.
-* Numerous bug fixes to both WMD and Showdown
+**Text fields**
+
+
+    name = ________
+
+produces:
+
+    <label for="name">Name:</label> 
+    <input type="text" id="name" name="name"/>
+
+**Radio buttons**
+
+    sex = (x) male () female
+
+produces:
+
+    <label>Sex:</label> 
+    <input type="radio" name="sex" id="male" value="male" checked="checked"/><label for="male">Male</label>
+    <input type="radio" name="sex" id="female value="female"/><label for="female">Female</label>  
+
+**Check boxes**
+
+    phones = [] Android [x] iPhone [x] Blackberry
+
+produces:
+
+    <label>Phones:</label> 
+    <input type="checkbox" name="phones" id="Android" value="Android"/><label for="Android">Android</label>
+    <input type="checkbox" name="phones" id="iPhone" value="iPhone" checked="checked"/><label for="iPhone">iPhone</label>
+    <input type="checkbox" name="phones" id="Blackberry" value="Blackberry" checked="checked"/><label for="Blackberry">Blackberry</label>
+
+**Drop down**
+
+    city = {BOS, SFO, (NYC)}
+
+produces:
+
+    <label for="city">City:</label>
+    <select id="city" name="city">
+      <option value="BOS">BOS</option>
+      <option value="SFO">SFO</option>
+      <option value="NYC" selected="selected">NYC</option>
+    </select>
+
+**Required fields**
+
+    zip code* = ________
+
+produces:
+
+    <label for="zip-code" class="required-label">Zip code*:</label>
+    <input type="text" name="zip-code" id="zip-code" class="required-input"/>
+
 
 How to use
 ----------
@@ -55,6 +96,11 @@ How to use
 	        </script>
 	    </body>
 	</html>
+
+Status
+-------
+
+The new form elements have not yet been implemented.
 
 License
 -------
