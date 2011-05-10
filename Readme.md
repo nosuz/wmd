@@ -11,24 +11,18 @@ The goal of this project is to add support for simple input elements and forms t
 Major Changes from ChiperSoft Library Revision
 -------------
 
-**Text fields**
+### Text fields
 
-```markdown
-name = ________
-```
-
-produces:
+    name = ________
 
 ```html
 <label for="name">Name:</label> 
 <input type="text" id="name" name="name"/>
 ```
 
-**Radio buttons**
+### Radio buttons
 
     sex = (x) male () female
-
-produces:
 
 ```html
 <label>Sex:</label> 
@@ -36,11 +30,9 @@ produces:
 <input type="radio" name="sex" id="female value="female"/><label for="female">Female</label>  
 ```
 
-**Check boxes**
+### Check boxes
 
     phones = [] Android [x] iPhone [x] Blackberry
-
-produces:
 
 ```html
 <label>Phones:</label> 
@@ -49,11 +41,9 @@ produces:
 <input type="checkbox" name="phones" id="Blackberry" value="Blackberry" checked="checked"/><label for="Blackberry">Blackberry</label>
 ```
 
-**Drop down**
+### Drop down
 
     city = {BOS, SFO, (NYC)}
-
-produces:
 
 ```html
 <label for="city">City:</label>
@@ -63,11 +53,10 @@ produces:
   <option value="NYC" selected="selected">NYC</option>
 </select>
 ```
-**Required fields**
+
+### Required fields
 
     zip code* = ________
-
-produces:
 
 ```html
 <label for="zip-code" class="required-label">Zip code*:</label>
