@@ -27,7 +27,7 @@ Major Changes from ChiperSoft Library Revision
 ```html
 <label>Sex:</label> 
 <input type="radio" name="sex" id="male" value="male" checked="checked"/><label for="male">Male</label>
-<input type="radio" name="sex" id="female value="female"/><label for="female">Female</label>  
+<input type="radio" name="sex" id="female" value="female"/><label for="female">Female</label>  
 ```
 
 ### Check boxes
