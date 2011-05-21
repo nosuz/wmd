@@ -4,6 +4,8 @@ WMD: The Wysiwym Markdown Editor
 Introduction
 ------------
 
+**Note:** I have not yet begun work on this project.
+
 WMD is a JavaScript based code editor for the [Markdown](http://daringfireball.net/projects/markdown/) formatting language.  It includes a Markdown interpreter – Showdown – for live preview and output of the Markdown generated HTML.
 
 The goal of this project is to add support for simple input elements and forms to Markdown. This code is forked from the [ChiperSoft fork](https://github.com/ChiperSoft/wmd) of WMD, which, in turn, was forked from a number of other sources. All credit goes to the respective authors.
