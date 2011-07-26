@@ -88,6 +88,9 @@ Showdown.converter = function () {
 		// match consecutive blank lines with /\n+/ instead of something
 		// contorted like /[ \t]*\n+/ .
 		text = text.replace(/^[ \t]+$/mg, "");
+		
+		// Maleldil: turn "name = ______" into form input element
+		text = _CreateFormTextInput(text);
 
 		// Turn block-level HTML blocks into hash entries
 		text = _HashHTMLBlocks(text);
@@ -120,6 +123,31 @@ Showdown.converter = function () {
 
 
 		return text;
+	};
+	
+	var _CreateFormTextInput = function (text) {
+		//
+		// Converts text of the form:
+		// first name = ____
+		// into a form input like:
+		// <label for="first_name">First Name:</label>
+		// <input type="text" id="first_name" name="first_name"/>
+		//
+		// Specifics:
+		// * Each form input created in this way should be on its own line (or immediately following
+		//   a non-alpha, non-numeric character such as punctuation).
+		// * Requires at least 3 underscores on the right-hand side of the equals sign.
+		// * Currently does not check whether a <form> tag has been opened.
+		// 
+		return text.replace(/([a-zA-Z0-9 \t]+)=[ \t]*___+/g, function(wholeMatch, lhs) {
+			var cleaned = lhs.trim().replace(/\t/g, ' ');   // trim and convert tabs to spae
+			var inputName = cleaned.replace(/[ \t]/g, '_'); // convert spaces to underscores
+			var labelName = cleaned.split(' ').map(function(str) {
+					return str.charAt(0).toUpperCase() + str.slice(1);
+				}).join(' ') + ":";
+			return '<label for="' + inputName + '">' + labelName + 
+				'</label>\n<input type="text" id="' + inputName + '" name="' + inputName + '"/>';
+		});
 	};
 
 	var _StripLinkDefinitions = function (text) {
