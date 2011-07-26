@@ -91,6 +91,7 @@ Showdown.converter = function () {
 		
 		// Maleldil: turn "name = ______" into form input element
 		text = _CreateFormTextInput(text);
+		text = _CreateRadioButtonInput(text);
 
 		// Turn block-level HTML blocks into hash entries
 		text = _HashHTMLBlocks(text);
@@ -125,11 +126,20 @@ Showdown.converter = function () {
 		return text;
 	};
 	
+	// Capitalizes a string
+	var capitalize = function (str) {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+	
 	var _CreateFormTextInput = function (text) {
 		//
+		// Creates a form text input element.
 		// Converts text of the form:
+		//
 		// first name = ____
+		//
 		// into a form input like:
+		//
 		// <label for="first_name">First Name:</label>
 		// <input type="text" id="first_name" name="first_name"/>
 		//
@@ -140,15 +150,54 @@ Showdown.converter = function () {
 		// * Currently does not check whether a <form> tag has been opened.
 		// 
 		return text.replace(/([a-zA-Z0-9 \t]+)=[ \t]*___+/g, function(wholeMatch, lhs) {
-			var cleaned = lhs.trim().replace(/\t/g, ' ');   // trim and convert tabs to spae
+			var cleaned = lhs.trim().replace(/\t/g, ' ').toLowerCase();
 			var inputName = cleaned.replace(/[ \t]/g, '_'); // convert spaces to underscores
-			var labelName = cleaned.split(' ').map(function(str) {
-					return str.charAt(0).toUpperCase() + str.slice(1);
-				}).join(' ') + ":";
+			var labelName = cleaned.split(' ').map(capitalize).join(' ') + ":";
 			return '<label for="' + inputName + '">' + labelName + 
-				'</label>\n<input type="text" id="' + inputName + '" name="' + inputName + '"/>';
+				'</label><input type="text" id="' + inputName + '" name="' + inputName + '"/>';
 		});
 	};
+	
+	var _CreateRadioButtonInput = function (text) {
+		//
+		// Creates a group of radio buttons.
+		// Converts text of the form:
+		//
+		// sex = (x) male () female
+		//
+		// into:
+		//
+		// <label>Sex:</label>
+		// <input type="radio" name="sex" id="male" value="male" checked="true"/>
+		// <label for="male">Male</label>
+		// <input //type="radio" name="sex" id="female" value="female" checked="false"/>
+		// <label for="female">Female</label>
+		//
+		// Right now it only works on single-line expressions.
+		// 
+		// TODO: Make this work across multiple lines.
+		//
+		var regex = /([a-zA-Z][a-zA-Z0-9 \t_]*)=[ \t]*(\(x?\)[ \t]*[a-zA-Z0-9 \t_]+[\(\)a-zA-Z0-9 \t_]*)/g;
+		return text.replace(regex, function(whole, name, options) {
+			var cleanedName = name.trim().replace(/\t/g, ' ');
+			var inputName = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
+			var cleanedOptions = options.trim().replace(/\t/g, ' ');
+			var labelName = cleanedName.split(' ').map(capitalize).join(' ') + ":";
+			var output = '<label>' + labelName + '</label>';
+			var optRegex = /\((x?)\)[ \t]*([a-zA-Z0-9 \t_]+)/g;
+			var match = optRegex.exec(cleanedOptions);
+			while (match) {
+				var id = match[2].trim().replace(/\t/g, ' ').replace(/[ \t]/g, '_').toLowerCase();
+				var checkboxLabel = match[2].trim().replace(/\t/g, ' ').split(' ').map(capitalize).join(' ');
+				var checked = match[1] == 'x';
+				output += '<input type="radio" name="' + inputName + '" id="' + id + 
+						  '" value="' + id + '" checked="' + checked + '"/>';
+				output += '<label for="' + id + '">' + checkboxLabel + '</label>';
+				match = optRegex.exec(cleanedOptions);
+			}
+			return output;
+		});
+	}
 
 	var _StripLinkDefinitions = function (text) {
 		//
