@@ -99,7 +99,7 @@ How to use
 Status
 -------
 
-The new form elements have not yet been implemented.
+Text input boxes, radio boxes, and checkboxes have been implemented (though not fully tested).  Everything else still needs to be done.
 
 License
 -------
