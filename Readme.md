@@ -56,6 +56,19 @@ Major Changes from ChiperSoft Library Revision
 </select>
 ```
 
+Or with user-friendly labels:
+
+    city = {BOS -> Boston, SFO -> San Francisco, (NYC) -> New York City}
+
+```html
+<label for="city">City:</label>
+<select id="city" name="city">
+  <option value="BOS">Boston</option>
+  <option value="SFO">San Francisco</option>
+  <option value="NYC" selected="selected">New York City</option>
+</select>
+```
+
 ### Required fields
 
     zip code* = ________
