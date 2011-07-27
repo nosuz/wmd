@@ -92,6 +92,7 @@ Showdown.converter = function () {
 		// Maleldil: turn "name = ______" into form input element
 		text = _CreateFormTextInput(text);
 		text = _CreateRadioButtonInput(text);
+		text = _CreateCheckboxInput(text);
 
 		// Turn block-level HTML blocks into hash entries
 		text = _HashHTMLBlocks(text);
@@ -168,33 +169,79 @@ Showdown.converter = function () {
 		// into:
 		//
 		// <label>Sex:</label>
-		// <input type="radio" name="sex" id="male" value="male" checked="true"/>
+		// <input type="radio" name="sex" id="male" value="male" checked="checked"/>
 		// <label for="male">Male</label>
-		// <input //type="radio" name="sex" id="female" value="female" checked="false"/>
+		// <input type="radio" name="sex" id="female" value="female"/>
 		// <label for="female">Female</label>
 		//
 		// Right now it only works on single-line expressions.
 		// 
 		// TODO: Make this work across multiple lines.
 		//
-		var regex = /([a-zA-Z][a-zA-Z0-9 \t_]*)=[ \t]*(\(x?\)[ \t]*[a-zA-Z0-9 \t_]+[\(\)a-zA-Z0-9 \t_]*)/g;
+		var regex = /([a-zA-Z][a-zA-Z0-9 \t_\-]*)=[ \t]*(\(x?\)[ \t]*[a-zA-Z0-9 \t_\-]+[\(\)a-zA-Z0-9 \t_\-]*)/g;
 		return text.replace(regex, function(whole, name, options) {
 			var cleanedName = name.trim().replace(/\t/g, ' ');
 			var inputName = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
 			var cleanedOptions = options.trim().replace(/\t/g, ' ');
-			var labelName = cleanedName.split(' ').map(capitalize).join(' ') + ":";
+			var labelName = cleanedName + ":";
 			var output = '<label>' + labelName + '</label>';
-			var optRegex = /\((x?)\)[ \t]*([a-zA-Z0-9 \t_]+)/g;
+			var optRegex = /\((x?)\)[ \t]*([a-zA-Z0-9 \t_\-]+)/g;
 			var match = optRegex.exec(cleanedOptions);
 			while (match) {
 				var id = match[2].trim().replace(/\t/g, ' ').replace(/[ \t]/g, '_').toLowerCase();
-				var checkboxLabel = match[2].trim().replace(/\t/g, ' ').split(' ').map(capitalize).join(' ');
+				var checkboxLabel = match[2].trim().replace(/\t/g, ' ');
 				var checked = match[1] == 'x';
 				output += '<input type="radio" name="' + inputName + '" id="' + id + 
-						  '" value="' + id + '" checked="' + checked + '"/>';
+						  '" value="' + id + '" ' + (checked ? 'checked="checked"' : '') + '/>';
 				output += '<label for="' + id + '">' + checkboxLabel + '</label>';
 				match = optRegex.exec(cleanedOptions);
 			}
+			return output;
+		});
+	}
+	
+	var _CreateCheckboxInput = function (text) {
+		//
+		// Creates a group of checkboxes.
+		// Converts text of the form:
+		//
+		// phones = [] Android [x] iPhone [x] Blackberry
+		//
+		// into:
+		//
+		// <label>Phones:</label> 
+		// <input type="checkbox" name="phones" id="Android" value="Android"/>
+		// <label for="Android">Android</label>
+		// <input type="checkbox" name="phones" id="iPhone" value="iPhone" checked="checked"/>
+		// <label for="iPhone">iPhone</label>
+		// <input type="checkbox" name="phones" id="Blackberry" value="Blackberry" checked="checked"/>
+		// <label for="Blackberry">Blackberry</label>
+		//
+		// Right now it only works on single-line expressions.
+		// 
+		// TODO: Make this work across multiple lines.
+		//
+		console.log("running checkbox changer");
+		var regex = /([a-zA-Z][a-zA-Z0-9 \t_\-]*)=[ \t]*(\[x?\][ \t]*[a-zA-Z0-9 \t_\-]+[\[\]a-zA-Z0-9 \t_\-]*)/g;
+		return text.replace(regex, function(whole, name, options) {
+			var cleanedName = name.trim().replace(/\t/g, ' ');
+			var inputName = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
+			var cleanedOptions = options.trim().replace(/\t/g, ' ');
+			var labelName = cleanedName + ":";
+			var output = '<label>' + labelName + '</label>';
+			var optRegex = /\[(x?)\][ \t]*([a-zA-Z0-9 \t_\-]+)/g;
+			var match = optRegex.exec(cleanedOptions);
+			while (match) {
+				console.log(match);
+				var id = match[2].trim().replace(/\t/g, ' ').replace(/[ \t]/g, '_').toLowerCase();
+				var checkboxLabel = match[2].trim().replace(/\t/g, ' ');
+				var checked = match[1] == 'x';
+				output += '<input type="checkbox" name="' + inputName + '" id="' + id + 
+						  '" value="' + id + '" ' + (checked ? 'checked="checked"' : '') + '/>';
+				output += '<label for="' + id + '">' + checkboxLabel + '</label>';
+				match = optRegex.exec(cleanedOptions);
+			}
+			console.log("output: " + output);
 			return output;
 		});
 	}
