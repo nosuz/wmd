@@ -89,9 +89,13 @@ Showdown.converter = function () {
 		// contorted like /[ \t]*\n+/ .
 		text = text.replace(/^[ \t]+$/mg, "");
 		
-		// Maleldil: turn "name = ______" into form input element
+		// Turns "name = ______" into form input element
 		text = _CreateFormTextInput(text);
+		
+		// Turns expressions like "label = () option 1 () option 2 () option 3" into radio buttons
 		text = _CreateRadioButtonInput(text);
+		
+		// Turns expressions like "label = [] option 1 [x] option 2 [x] option 3" into checkboxes
 		text = _CreateCheckboxInput(text);
 
 		// Turn block-level HTML blocks into hash entries
@@ -221,7 +225,6 @@ Showdown.converter = function () {
 		// 
 		// TODO: Make this work across multiple lines.
 		//
-		console.log("running checkbox changer");
 		var regex = /([a-zA-Z][a-zA-Z0-9 \t_\-]*)=[ \t]*(\[x?\][ \t]*[a-zA-Z0-9 \t_\-]+[\[\]a-zA-Z0-9 \t_\-]*)/g;
 		return text.replace(regex, function(whole, name, options) {
 			var cleanedName = name.trim().replace(/\t/g, ' ');
@@ -232,7 +235,6 @@ Showdown.converter = function () {
 			var optRegex = /\[(x?)\][ \t]*([a-zA-Z0-9 \t_\-]+)/g;
 			var match = optRegex.exec(cleanedOptions);
 			while (match) {
-				console.log(match);
 				var id = match[2].trim().replace(/\t/g, ' ').replace(/[ \t]/g, '_').toLowerCase();
 				var checkboxLabel = match[2].trim().replace(/\t/g, ' ');
 				var checked = match[1] == 'x';
@@ -241,7 +243,6 @@ Showdown.converter = function () {
 				output += '<label for="' + id + '">' + checkboxLabel + '</label>';
 				match = optRegex.exec(cleanedOptions);
 			}
-			console.log("output: " + output);
 			return output;
 		});
 	}
