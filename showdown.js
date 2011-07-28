@@ -89,7 +89,7 @@ Showdown.converter = function () {
 		// contorted like /[ \t]*\n+/ .
 		text = text.replace(/^[ \t]+$/mg, "");
 		
-		// Turns "name = ______" into form input element
+		// Turns "name = ___" into form input element
 		text = _CreateFormTextInput(text);
 		
 		// Turns expressions like "label = () option 1 () option 2 () option 3" into radio buttons
@@ -140,29 +140,75 @@ Showdown.converter = function () {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
 	
+	var _Templater = {
+		format: function(template, values) {
+			//
+			// Utility function that replaces placeholders with parameterized values
+			//
+			// Example:
+			// Inputs:
+			// template = 'Here is some text: %text%'
+			// values = {'text', 'Hello I am text!'}
+			//
+			// Output:
+			// 'Here is some text: Hello I am text!'
+			//
+			// @param template The template to do replacements on.  Fields to be replaced should be surrounded
+			//                 by percentage signs (e.g. %field%)
+			// @param values A Javascript object literal containing the names of the fields to be replaced
+			//               along with the replacement values (e.g. {'field': 'Replacement text'}
+			for (value in values) {
+				template = template.replace(new RegExp('%' + value + '%', 'g'), values[value], 'g');
+			}
+			return template;
+		}
+	}
+	
 	var _CreateFormTextInput = function (text) {
 		//
 		// Creates a form text input element.
 		// Converts text of the form:
 		//
-		// first name = ____
+		// "first name = ___"
 		//
 		// into a form input like:
 		//
 		// <label for="first_name">First Name:</label>
-		// <input type="text" id="first_name" name="first_name"/>
+		// <input type="text" id="first_name" name="first_name" size="20"/>
+		//
+		// Or specifying input field size:
+		//
+		// "first name = ___[50]"
+		//
+		// into:
+		// 
+		// <label for="first_name">First Name:</label>
+		// <input type="text" id="first_name" name="first_name" size="50"/>
+		//
+		// Or specifying a required field:
+		//
+		// "first name* = ___"
+		//
+		// into:
+		//
+		// <label for="first-name" class="required-label">First Name*:</label>
+		// <input type="text" id="first-name" name="first-name" size="20" class="required-input"/>
 		//
 		// Specifics:
 		// * Each form input created in this way should be on its own line.
-		// * Requires at least 3 underscores on the right-hand side of the equals sign.
+		// * Requires exactly 3 underscores on the right-hand side of the equals sign.
 		// * Currently does not check whether a <form> tag has been opened.
 		// 
-		return text.replace(/(\w[\w \t\-]*)=[ \t]*___+/g, function(wholeMatch, lhs) {
-			var cleaned = lhs.trim().replace(/\t/g, ' ').toLowerCase();
-			var inputName = cleaned.replace(/[ \t]/g, '_'); // convert spaces to underscores
-			var labelName = cleaned.split(' ').map(capitalize).join(' ') + ":";
-			return '<label for="' + inputName + '">' + labelName + 
-				'</label><input type="text" id="' + inputName + '" name="' + inputName + '"/>';
+		return text.replace(/(\w[\w \t\-]*(\*)?)[ \t]*=[ \t]*___(\[\d+\])?/g, function(wholeMatch, lhs, required, size) {
+			var cleaned = lhs.replace(/\*/g, '').trim().replace(/\t/g, ' ').toLowerCase();
+			var inputName = cleaned.replace(/[ \t]/g, '-'); // convert spaces to hyphens
+			var labelName = cleaned.split(' ').map(capitalize).join(' ') + (required ? '*:' : ':');
+			var template = '<label for="%id%" class="%labelClass%">%label%</label>' +
+						   '<input type="text" id="%id%" name="%id%" size="%size%" class="%inputClass%"/>';
+			size = size ? size.match(/\d+/g)[0] : 20;
+			var labelClass = required ? 'required-label' : '';
+			var inputClass = required ? 'required-input' : '';
+			return _Templater.format(template, {id: inputName, label: labelName, size: size, labelClass: labelClass, inputClass: inputClass});
 		});
 	};
 	

@@ -15,12 +15,24 @@ Major Changes from ChiperSoft Library Revision
 
 ### Text fields
 
-    name = ________
+    name = ___
 
 ```html
 <label for="name">Name:</label> 
-<input type="text" id="name" name="name"/>
+<input type="text" id="name" name="name" size="20"/>
 ```
+
+Or:
+
+    name = ___[50]
+	
+```html
+<label for="name">Name:</label> 
+<input type="text" id="name" name="name" size="50"/>
+```
+
+Exactly 3 underscores will be matched.  Any more will be handled as standard underline directives.  Default input size is 20.
+
 
 ### Radio buttons
 
@@ -84,12 +96,20 @@ Or both:
 
 ### Required fields
 
-    zip code* = ________
+    zip code* = ___
 
 ```html
 <label for="zip-code" class="required-label">Zip code*:</label>
-<input type="text" name="zip-code" id="zip-code" class="required-input"/>
+<input type="text" name="zip-code" id="zip-code" size="20" class="required-input"/>
 ```
+
+    zip code* = ___[50]
+
+```html
+<label for="zip-code" class="required-label">Zip code*:</label>
+<input type="text" name="zip-code" id="zip-code" size="50" class="required-input"/>
+```
+
 
 How to use
 ----------
