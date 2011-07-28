@@ -58,13 +58,26 @@ Major Changes from ChiperSoft Library Revision
 
 Or with user-friendly labels:
 
-    city = {BOS -> Boston, SFO -> San Francisco, (NYC) -> New York City}
+    city = {BOS -> Boston, SFO -> San Francisco, (NYC -> New York City)}
 
 ```html
 <label for="city">City:</label>
 <select id="city" name="city">
   <option value="BOS">Boston</option>
   <option value="SFO">San Francisco</option>
+  <option value="NYC" selected="selected">New York City</option>
+</select>
+```
+
+Or both:
+
+    city = {BOS, SFO, (NYC -> New York City)}
+	
+```html
+<label for="city">City:</label>
+<select id="city" name="city">
+  <option value="BOS">BOS</option>
+  <option value="SFO">SFO</option>
   <option value="NYC" selected="selected">New York City</option>
 </select>
 ```

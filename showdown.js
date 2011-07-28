@@ -97,6 +97,10 @@ Showdown.converter = function () {
 		
 		// Turns expressions like "label = [] option 1 [x] option 2 [x] option 3" into checkboxes
 		text = _CreateCheckboxInput(text);
+		
+		// Turns expressions like "Please select = {option1, option2, (option3)}" into an HTML select
+		// form input, with whichever option is in parentheses will be the default selection
+		text = _CreateDropdownInput(text);
 
 		// Turn block-level HTML blocks into hash entries
 		text = _HashHTMLBlocks(text);
@@ -149,12 +153,11 @@ Showdown.converter = function () {
 		// <input type="text" id="first_name" name="first_name"/>
 		//
 		// Specifics:
-		// * Each form input created in this way should be on its own line (or immediately following
-		//   a non-alpha, non-numeric character such as punctuation).
+		// * Each form input created in this way should be on its own line.
 		// * Requires at least 3 underscores on the right-hand side of the equals sign.
 		// * Currently does not check whether a <form> tag has been opened.
 		// 
-		return text.replace(/([a-zA-Z0-9 \t]+)=[ \t]*___+/g, function(wholeMatch, lhs) {
+		return text.replace(/(\w[\w \t\-]*)=[ \t]*___+/g, function(wholeMatch, lhs) {
 			var cleaned = lhs.trim().replace(/\t/g, ' ').toLowerCase();
 			var inputName = cleaned.replace(/[ \t]/g, '_'); // convert spaces to underscores
 			var labelName = cleaned.split(' ').map(capitalize).join(' ') + ":";
@@ -182,7 +185,7 @@ Showdown.converter = function () {
 		// 
 		// TODO: Make this work across multiple lines.
 		//
-		var regex = /([a-zA-Z][a-zA-Z0-9 \t_\-]*)=[ \t]*(\(x?\)[ \t]*[a-zA-Z0-9 \t_\-]+[\(\)a-zA-Z0-9 \t_\-]*)/g;
+		var regex = /(\w[\w \t\-]*)=[ \t]*(\(x?\)[ \t]*[\w \t\-]+[\(\)\w \t\-]*)/g;
 		return text.replace(regex, function(whole, name, options) {
 			var cleanedName = name.trim().replace(/\t/g, ' ');
 			var inputName = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
@@ -225,14 +228,14 @@ Showdown.converter = function () {
 		// 
 		// TODO: Make this work across multiple lines.
 		//
-		var regex = /([a-zA-Z][a-zA-Z0-9 \t_\-]*)=[ \t]*(\[x?\][ \t]*[a-zA-Z0-9 \t_\-]+[\[\]a-zA-Z0-9 \t_\-]*)/g;
+		var regex = /(\w[\w \t\-]*)=[ \t]*(\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)/g;
 		return text.replace(regex, function(whole, name, options) {
 			var cleanedName = name.trim().replace(/\t/g, ' ');
 			var inputName = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
 			var cleanedOptions = options.trim().replace(/\t/g, ' ');
 			var labelName = cleanedName + ":";
 			var output = '<label>' + labelName + '</label>';
-			var optRegex = /\[(x?)\][ \t]*([a-zA-Z0-9 \t_\-]+)/g;
+			var optRegex = /\[(x?)\][ \t]*([\w \t\-]+)/g;
 			var match = optRegex.exec(cleanedOptions);
 			while (match) {
 				var id = match[2].trim().replace(/\t/g, ' ').replace(/[ \t]/g, '_').toLowerCase();
@@ -245,7 +248,64 @@ Showdown.converter = function () {
 			}
 			return output;
 		});
-	}
+	};
+
+	var _CreateDropdownInput = function (text) {
+		//
+		// Creates an HTML dropdown menu.
+		//
+		// Text can be one of two forms:
+		// 1) Label Text = {Option1, Option2, (Option3)}
+		//    becomes:
+		//    <label for="label_text">Label Text:</label>
+		//    <select id="label_text" name="label_text">
+		//    <option value="Option1">Option1</option>
+		//    <option value="Option2">Option2</option>
+        //	  <option value="Option3" selected="selected">Option3</option>
+		//    </select>
+		// 2) Label Text = {Value1 -> Option1, (Value2 -> Option2)}
+		//    becomes:
+		//    <label for="label_text">Label Text:</label>
+		//    <select id="label_text" name="label_text">
+		//    <option value="Value1">Option1</option>
+		//    <option value="Value2" selected="selected">Option2</option>
+		//    </select>
+		//
+		// These can be mixed and matched, e.g. "Label Text = {Option1, Value2 -> Option2, Option3, (Value4 -> Option4)}"
+		//
+		// Any spaces on the left-hand side of the equal-sign will be converted into underscores
+		// to use as the id and name fields for the label and select tags.
+		//
+		var regex = /(\w[\w \t_\-]*)=[ \t]*\{([a-zA-Z0-9 \t\->_,\(\)]+)\}/g;
+		return text.replace(regex, function(whole, name, options) {
+			var cleanedName = name.trim().replace(/\t/g, ' ');
+			var id = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
+			var output = '<label for="' + id + '">' + cleanedName + ':</label>\n' +
+						 '<select id="' + id + '" name="' + id + '">';
+			options.split(',').forEach(function(opt) {
+				var selectedItemRegex = /\((.*)\)/g;
+				// Test to see if option is surrounded by parens, indicating it's the default option
+				var match = selectedItemRegex.exec(opt);
+				var contents = match ? match[1].trim() : opt.trim();
+				// Test to see if using the "value -> name" type of option
+				var namedOptionRegex = /(.+)\->(.+)/g;
+				var namedOptionMatch = namedOptionRegex.exec(contents);
+				var optionName, optionValue;
+				if (namedOptionMatch) {
+					optionValue = namedOptionMatch[1].trim();
+					optionName = namedOptionMatch[2].trim();
+				} else {
+					optionName = contents;
+					optionValue = contents;
+				}
+				output += '<option value="' + optionValue + '"' + 
+						  (match ? ' selected="selected">' : '>') 
+						  + optionName + '</option>';
+			});
+			output += '</select>\n';
+			return output;
+		});
+	};
 
 	var _StripLinkDefinitions = function (text) {
 		//
