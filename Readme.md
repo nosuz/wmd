@@ -145,7 +145,7 @@ How to use
 Status
 -------
 
-Text input boxes, radio boxes, and checkboxes have been implemented (though not fully tested).  Everything else still needs to be done.
+All documented features have been implemented and tested with basic use cases.  It could use more thorough testing, though.
 
 License
 -------
