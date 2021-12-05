@@ -88,16 +88,16 @@ Showdown.converter = function () {
 		// match consecutive blank lines with /\n+/ instead of something
 		// contorted like /[ \t]*\n+/ .
 		text = text.replace(/^[ \t]+$/mg, "");
-		
+
 		// Turns "name = ___" into form input element
 		text = _CreateFormTextInput(text);
-		
+
 		// Turns expressions like "label = () option 1 () option 2 () option 3" into radio buttons
 		text = _CreateRadioButtonInput(text);
-		
+
 		// Turns expressions like "label = [] option 1 [x] option 2 [x] option 3" into checkboxes
 		text = _CreateCheckboxInput(text);
-		
+
 		// Turns expressions like "Please select = {option1, option2, (option3)}" into an HTML select
 		// form input, with whichever option is in parentheses will be the default selection
 		text = _CreateDropdownInput(text);
@@ -134,12 +134,12 @@ Showdown.converter = function () {
 
 		return text;
 	};
-	
+
 	// Capitalizes a string
 	var capitalize = function (str) {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
-	
+
 	var _Templater = {
 		format: function(template, values) {
 			//
@@ -163,7 +163,7 @@ Showdown.converter = function () {
 			return template;
 		}
 	}
-	
+
 	var _CreateFormTextInput = function (text) {
 		//
 		// Creates a form text input element.
@@ -181,7 +181,7 @@ Showdown.converter = function () {
 		// "first name = ___[50]"
 		//
 		// into:
-		// 
+		//
 		// <label for="first_name">First Name:</label>
 		// <input type="text" id="first_name" name="first_name" size="50"/>
 		//
@@ -198,8 +198,8 @@ Showdown.converter = function () {
 		// * Each form input created in this way should be on its own line.
 		// * Requires exactly 3 underscores on the right-hand side of the equals sign.
 		// * Currently does not check whether a <form> tag has been opened.
-		// 
-		return text.replace(/(\w[\w \t\-]*(\*)?)[ \t]*=[ \t]*___(\[\d+\])?/g, function(wholeMatch, lhs, required, size) {
+		//
+		return text.replace(/([\wぁ-んァ-ヶ一-龠][\wぁ-んァ-ヶ一-龠 \t\-]*(\*)?)[ \t]*=[ \t]*___(\[\d+\])?/g, function(wholeMatch, lhs, required, size) {
 			var cleaned = lhs.replace(/\*/g, '').trim().replace(/\t/g, ' ').toLowerCase();
 			var inputName = cleaned.replace(/[ \t]/g, '-'); // convert spaces to hyphens
 			var labelName = cleaned.split(' ').map(capitalize).join(' ') + (required ? '*:' : ':');
@@ -211,7 +211,7 @@ Showdown.converter = function () {
 			return _Templater.format(template, {id: inputName, label: labelName, size: size, labelClass: labelClass, inputClass: inputClass});
 		});
 	};
-	
+
 	var _CreateRadioButtonInput = function (text) {
 		//
 		// Creates a group of radio buttons.
@@ -228,23 +228,23 @@ Showdown.converter = function () {
 		// <label for="female">Female</label>
 		//
 		// Right now it only works on single-line expressions.
-		// 
+		//
 		// TODO: Make this work across multiple lines.
 		//
-		var regex = /(\w[\w \t\-]*)=[ \t]*(\(x?\)[ \t]*[\w \t\-]+[\(\)\w \t\-]*)/g;
+		var regex = /([\wぁ-んァ-ヶ一-龠][\wぁ-んァ-ヶ一-龠 \t\-]*)=[ \t]*(\(x?\)[ \t]*[\wぁ-んァ-ヶ一-龠 \t\-]+[\(\)\wぁ-んァ-ヶ一-龠 \t\-]*)/g;
 		return text.replace(regex, function(whole, name, options) {
 			var cleanedName = name.trim().replace(/\t/g, ' ');
 			var inputName = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
 			var cleanedOptions = options.trim().replace(/\t/g, ' ');
 			var labelName = cleanedName + ":";
 			var output = '<label>' + labelName + '</label>';
-			var optRegex = /\((x?)\)[ \t]*([a-zA-Z0-9 \t_\-]+)/g;
+			var optRegex = /\((x?)\)[ \t]*([a-zA-Z0-9ぁ-んァ-ヶ一-龠 \t_\-]+)/g;
 			var match = optRegex.exec(cleanedOptions);
 			while (match) {
 				var id = match[2].trim().replace(/\t/g, ' ').replace(/[ \t]/g, '_').toLowerCase();
 				var checkboxLabel = match[2].trim().replace(/\t/g, ' ');
 				var checked = match[1] == 'x';
-				output += '<input type="radio" name="' + inputName + '" id="' + id + 
+				output += '<input type="radio" name="' + inputName + '" id="' + id +
 						  '" value="' + id + '" ' + (checked ? 'checked="checked"' : '') + '/>';
 				output += '<label for="' + id + '">' + checkboxLabel + '</label>';
 				match = optRegex.exec(cleanedOptions);
@@ -252,7 +252,7 @@ Showdown.converter = function () {
 			return output;
 		});
 	}
-	
+
 	var _CreateCheckboxInput = function (text) {
 		//
 		// Creates a group of checkboxes.
@@ -262,7 +262,7 @@ Showdown.converter = function () {
 		//
 		// into:
 		//
-		// <label>Phones:</label> 
+		// <label>Phones:</label>
 		// <input type="checkbox" name="phones" id="Android" value="Android"/>
 		// <label for="Android">Android</label>
 		// <input type="checkbox" name="phones" id="iPhone" value="iPhone" checked="checked"/>
@@ -271,23 +271,23 @@ Showdown.converter = function () {
 		// <label for="Blackberry">Blackberry</label>
 		//
 		// Right now it only works on single-line expressions.
-		// 
+		//
 		// TODO: Make this work across multiple lines.
 		//
-		var regex = /(\w[\w \t\-]*)=[ \t]*(\[x?\][ \t]*[\w \t\-]+[\[\]\w \t\-]*)/g;
+		var regex = /([\wぁ-んァ-ヶ一-龠][\wぁ-んァ-ヶ一-龠 \t\-]*)=[ \t]*(\[x?\][ \t]*[\wぁ-んァ-ヶ一-龠 \t\-]+[\[\]\wぁ-んァ-ヶ一-龠 \t\-]*)/g;
 		return text.replace(regex, function(whole, name, options) {
 			var cleanedName = name.trim().replace(/\t/g, ' ');
 			var inputName = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
 			var cleanedOptions = options.trim().replace(/\t/g, ' ');
 			var labelName = cleanedName + ":";
 			var output = '<label>' + labelName + '</label>';
-			var optRegex = /\[(x?)\][ \t]*([\w \t\-]+)/g;
+			var optRegex = /\[(x?)\][ \t]*([\wぁ-んァ-ヶ一-龠 \t\-]+)/g;
 			var match = optRegex.exec(cleanedOptions);
 			while (match) {
 				var id = match[2].trim().replace(/\t/g, ' ').replace(/[ \t]/g, '_').toLowerCase();
 				var checkboxLabel = match[2].trim().replace(/\t/g, ' ');
 				var checked = match[1] == 'x';
-				output += '<input type="checkbox" name="' + inputName + '" id="' + id + 
+				output += '<input type="checkbox" name="' + inputName + '" id="' + id +
 						  '" value="' + id + '" ' + (checked ? 'checked="checked"' : '') + '/>';
 				output += '<label for="' + id + '">' + checkboxLabel + '</label>';
 				match = optRegex.exec(cleanedOptions);
@@ -322,7 +322,7 @@ Showdown.converter = function () {
 		// Any spaces on the left-hand side of the equal-sign will be converted into underscores
 		// to use as the id and name fields for the label and select tags.
 		//
-		var regex = /(\w[\w \t_\-]*)=[ \t]*\{([a-zA-Z0-9 \t\->_,\(\)]+)\}/g;
+		var regex = /([\wぁ-んァ-ヶ一-龠][\wぁ-んァ-ヶ一-龠 \t_\-]*)=[ \t]*\{([a-zA-Z0-9ぁ-んァ-ヶ一-龠 \t\->_,\(\)]+)\}/g;
 		return text.replace(regex, function(whole, name, options) {
 			var cleanedName = name.trim().replace(/\t/g, ' ');
 			var id = cleanedName.replace(/[ \t]/g, '_').toLowerCase();
@@ -344,8 +344,8 @@ Showdown.converter = function () {
 					optionName = contents;
 					optionValue = contents;
 				}
-				output += '<option value="' + optionValue + '"' + 
-						  (match ? ' selected="selected">' : '>') 
+				output += '<option value="' + optionValue + '"' +
+						  (match ? ' selected="selected">' : '>')
 						  + optionName + '</option>';
 			});
 			output += '</select>\n';
@@ -459,7 +459,7 @@ Showdown.converter = function () {
 		text = text.replace(/^(<(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|script|noscript|form|fieldset|iframe|math)\b[^\r]*?.*<\/\2>[ \t]*(?=\n+)\n)/gm, hashElement);
 
 		// Special case just for <hr />. It was easier to make a special case than
-		// to make the other regex more complicated.  
+		// to make the other regex more complicated.
 /*
 		text = text.replace(/
 		(						// save in $1
@@ -467,7 +467,7 @@ Showdown.converter = function () {
 			[ ]{0,3}
 			(<(hr)				// start tag = $2
 			\b					// word break
-			([^<>])*?			// 
+			([^<>])*?			//
 			\/?>)				// the matching end tag
 			[ \t]*
 			(?=\n{2,})			// followed by a blank line
@@ -594,7 +594,7 @@ Showdown.converter = function () {
 		// Within tags -- meaning between < and > -- encode [\ ` * _] so they
 		// don't conflict with their use in Markdown for code, italics and strong.
 		//
-		// Build a regex to find HTML tags and comments.  See Friedl's 
+		// Build a regex to find HTML tags and comments.  See Friedl's
 		// "Mastering Regular Expressions", 2nd Ed., pp. 200-201.
 		var regex = /(<[a-z\/!$]("[^"]*"|'[^']*'|[^'">])*>|<!(--.*?--\s*)+>)/gi;
 
@@ -743,7 +743,7 @@ Showdown.converter = function () {
 			title = escapeCharacters(title, "*_");
 			result += " title=\"" + title + "\"";
 		}
-		
+
 		if (blank_target) {
 			result += " target=\"_blank\"";
 		}
@@ -858,7 +858,7 @@ Showdown.converter = function () {
 		// Setext-style headers:
 		//	Header 1
 		//	========
-		//  
+		//
 		//	Header 2
 		//	--------
 		//
@@ -1043,7 +1043,7 @@ Showdown.converter = function () {
 	var _DoCodeBlocks = function (text) {
 		//
 		//  Process Markdown `<pre><code>` blocks.
-		//  
+		//
 /*
 		text = text.replace(text,
 			/(?:\n\n|^)
@@ -1088,26 +1088,26 @@ Showdown.converter = function () {
 	var _DoCodeSpans = function (text) {
 		//
 		//   *  Backtick quotes are used for <code></code> spans.
-		// 
+		//
 		//   *  You can use multiple backticks as the delimiters if you want to
 		//	 include literal backticks in the code span. So, this input:
-		//	 
+		//
 		//		 Just type ``foo `bar` baz`` at the prompt.
-		//	 
+		//
 		//	   Will translate to:
-		//	 
+		//
 		//		 <p>Just type <code>foo `bar` baz</code> at the prompt.</p>
-		//	 
+		//
 		//	There's no arbitrary limit to the number of backticks you
 		//	can use as delimters. If you need three consecutive backticks
 		//	in your code, use four for delimiters, etc.
 		//
 		//  *  You can use spaces to get literal backticks at the edges:
-		//	 
+		//
 		//		 ... type `` `bar` `` ...
-		//	 
+		//
 		//	   Turns to:
-		//	 
+		//
 		//		 ... type <code>`bar`</code> ...
 		//
 /*
@@ -1158,7 +1158,7 @@ Showdown.converter = function () {
 			c = _EncodeCode(c);
 			return m1 + "<strike>" + c + "</strike>";
 		});
-		
+
 		return text;
 	};
 
@@ -1295,7 +1295,7 @@ Showdown.converter = function () {
 			}
 			else if (str.search(/\S/) >= 0) {
 				str = _RunSpanGamut(str);
-				
+
 				if (str.substr(0,2)==='->') {
 					if (str.substr(-5)==='&lt;-') {
 						p_tag = '<p align="center">';
@@ -1305,7 +1305,7 @@ Showdown.converter = function () {
 						str = str.substring(2);
 					}
 				}
-				
+
 				str = str.replace(/\n/g, "<br />"); // ** GFM **
 				str = str.replace(/^([ \t]*)/g, p_tag);
 				str += "</p>";
@@ -1358,18 +1358,18 @@ Showdown.converter = function () {
 
 		return text;
 	};
-	
+
 	var _ConvertExtraSpecialCharacters = function (text) {
 		// Processing to change various special character combinations into
 		// common real characters.
-		
+
 		text = text.
 			replace( /\.\.\./g	, '&hellip;').
 			replace( /\(c\)/g	, '&copy;').
 			replace( /\(r\)/g	, '&reg;').
 			replace( /\(tm\)/g	, '&trade;').
 			replace( /\-\-/g, '&mdash;');
-	
+
 		return text;
 	};
 
